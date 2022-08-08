@@ -1,0 +1,40 @@
+{
+	"Caption": "Main",
+	"Controls": [
+		{
+			"_Name": "SectionedTable0",
+			"_Type": "Control.Type.SectionedTable",
+			"Sections": [
+				{
+					"Buttons": [
+						{
+							"OnPress": "/MyMDKTest/Actions/SrvAuthors/NavToSrvAuthors_List.action",
+							"TextAlignment": "center",
+							"Title": "SrvAuthors"
+						},
+						{
+							"OnPress": "/MyMDKTest/Actions/SrvBooks/NavToSrvBooks_List.action",
+							"TextAlignment": "center",
+							"Title": "SrvBooks"
+						}
+					],
+					"_Name": "SectionButtonTable0",
+					"_Type": "Section.Type.ButtonTable"
+				}
+			]
+		}
+	],
+	"_Name": "Main",
+	"_Type": "Page",
+	"ToolBar": {
+		"Items": [
+			{
+				"_Name": "LogoutToolbarItem",
+				"_Type": "Control.Type.ToolbarItem",
+				"Caption": "Logout",
+				"OnPress": "/MyMDKTest/Actions/Logout.action"
+			}
+		]
+	},
+	"PrefersLargeCaption": true
+}

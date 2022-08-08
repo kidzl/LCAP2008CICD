@@ -1,0 +1,222 @@
+_schema-version: '3.1'
+ID: crystallcap2008EU10
+version: 1.0.0
+description: A simple CAP project.
+parameters:
+  enable-parallel-deployments: true
+build-parameters:
+  before-all:
+    - builder: custom
+      commands:
+        - rm -rf build/ui-deployer
+        - mkdir -p build/ui-deployer
+        - rm -rf build/dist
+        - mkdir -p build/dist
+    - builder: custom
+      commands:
+        - npm install --production
+        - >-
+          bash -c "cds -v | grep 'cds-dk' || npm i --production --no-save
+          @sap/cds-dk @sap/mdk-tools"
+        - bash -c "export PATH=$PATH:$(pwd)/node_modules/.bin"
+        - cds build --production
+modules:
+  - name: crystallcap2008EU10-MyMDKTest
+    type: html5
+    path: app/MyMDKTest
+    build-parameters:
+      builder: custom
+      commands:
+        - mdk build --target module --ui5 --forceUpdate
+        - bash -c "cd Web/MDKModule && rm -rf .npmrc && npm install"
+        - bash -c "cd Web/MDKModule && npm run build"
+        - >-
+          bash -c "mv Web/MDKModule/MDKModule-content.zip
+          ../../build/dist/MyMDKTest.zip"
+        - rm -rf Web/MDKModule/dist
+      _artifactName: MyMDKTest.zip
+      supported-platforms: []
+      build-result: ../../build/dist
+  - name: crystallcap2008EU10-crystallcap2008EU10.FioriTest
+    type: html5
+    path: app/crystallcap2008EU10.FioriTest
+    build-parameters:
+      builder: custom
+      commands:
+        - rm -rf dist-zip dist
+        - >-
+          npx -p @ui5/cli ui5 build --dest dist
+          --include-task=generateManifestBundle
+          --include-task=generateCachebusterInfo
+        - mkdir dist-zip
+        - >-
+          bash -c "cd dist && npx bestzip
+          ../dist-zip/crystallcap2008EU10.FioriTest.zip *"
+      _artifactName: crystallcap2008EU10.FioriTest.zip
+      supported-platforms: []
+      build-result: dist-zip
+  - name: crystallcap2008EU10-db-deployer
+    type: hdb
+    path: gen/db
+    parameters:
+      buildpack: nodejs_buildpack
+    build-parameters:
+      builder: npm
+      ignore:
+        - node_modules
+        - package-lock.json
+    requires:
+      - name: crystallcap2008EU10-service-uaa
+      - name: crystallcap2008EU10-service-db
+  - name: crystallcap2008EU10-srv
+    type: nodejs
+    path: gen/srv
+    parameters:
+      memory: 256MB
+    provides:
+      - name: srv-api
+        properties:
+          srv-url: ${default-url}
+    build-parameters:
+      builder: npm
+      ignore:
+        - node_modules
+        - package-lock.json
+    requires:
+      - name: crystallcap2008EU10-service-uaa
+      - name: crystallcap2008EU10-service-db
+      - name: crystallcap2008EU10-service-destination
+      - name: crystallcap2008EU10-service-metadata
+      - name: crystallcap2008EU10-service-connectivity
+      - name: crystallcap2008EU10-service-logs
+  - name: crystallcap2008EU10-aux-destinations
+    type: com.sap.application.content
+    parameters:
+      content:
+        subaccount:
+          existing_destinations_policy: update
+          destinations:
+            - Authentication: OAuth2UserTokenExchange
+              Name: crystallcap2008EU10-service-uaa
+              ServiceInstanceName: crystallcap2008EU10-uaa
+              ServiceKeyName: crystallcap2008EU10-uaa-key
+              sap.cloud.service: lcap.crystallcap2008EU10
+            - Authentication: OAuth2UserTokenExchange
+              Name: crystallcap2008EU10-app-srv
+              TokenServiceInstanceName: crystallcap2008EU10-uaa
+              TokenServiceKeyName: crystallcap2008EU10-uaa-key
+              URL: ~{srv-api/srv-url}
+              sap.cloud.service: lcap.crystallcap2008EU10
+            - Name: crystallcap2008EU10-service-html5-apps-repo-host
+              ServiceInstanceName: crystallcap2008EU10-html5-apps-repo-host
+              ServiceKeyName: crystallcap2008EU10-html5-apps-repo-host-key
+              sap.cloud.service: lcap.crystallcap2008EU10
+    build-parameters:
+      no-source: true
+    requires:
+      - name: crystallcap2008EU10-service-uaa
+        parameters:
+          service-key:
+            name: crystallcap2008EU10-uaa-key
+      - name: srv-api
+      - name: crystallcap2008EU10-service-html5-apps-repo-host
+        parameters:
+          service-key:
+            name: crystallcap2008EU10-html5-apps-repo-host-key
+      - name: crystallcap2008EU10-service-destination
+        parameters:
+          content-target: true
+  - name: crystallcap2008EU10-launchpad
+    type: html5
+    path: build/launchpad
+    build-parameters:
+      builder: custom
+      commands:
+        - npm install
+        - >-
+          npx -p @ui5/cli ui5 build --dest dist
+          --include-task=generateManifestBundle
+          --include-task=generateCachebusterInfo
+        - bash -c "cd dist && npx bestzip ../../../build/dist/launchpad.zip *"
+        - rm -rf dist
+      _artifactName: launchpad.zip
+      supported-platforms: []
+      build-result: ../../build/dist
+  - name: crystallcap2008EU10-aux-ui-deployer
+    type: com.sap.application.content
+    path: build/ui-deployer
+    build-parameters:
+      build-result: resources
+      requires:
+        - name: crystallcap2008EU10-MyMDKTest
+          artifacts:
+            - MyMDKTest.zip
+          target-path: resources
+        - name: crystallcap2008EU10-crystallcap2008EU10.FioriTest
+          artifacts:
+            - crystallcap2008EU10.FioriTest.zip
+          target-path: resources
+        - name: crystallcap2008EU10-launchpad
+          artifacts:
+            - launchpad.zip
+          target-path: resources
+    requires:
+      - name: crystallcap2008EU10-service-html5-apps-repo-host
+        parameters:
+          content-target: true
+resources:
+  - type: org.cloudfoundry.managed-service
+    name: crystallcap2008EU10-service-uaa
+    parameters:
+      service: xsuaa
+      service-plan: application
+      service-name: crystallcap2008EU10-uaa
+      path: xs-security.json
+      config:
+        xsappname: crystallcap2008EU10-${space}
+        role-collections:
+          - description: PersonalDataManager
+            name: crystallcap2008EU10-PersonalDataManager-${space}
+            role-template-references:
+              - $XSAPPNAME.PersonalDataManager
+  - type: org.cloudfoundry.managed-service
+    name: crystallcap2008EU10-service-db
+    parameters:
+      service: hana
+      service-plan: hdi-shared
+      service-name: crystallcap2008EU10-db
+  - type: org.cloudfoundry.managed-service
+    name: crystallcap2008EU10-service-destination
+    parameters:
+      service: destination
+      service-plan: lite
+      service-name: crystallcap2008EU10-destination
+      config:
+        HTML5Runtime_enabled: true
+        version: 1.0.0
+  - type: org.cloudfoundry.user-provided-service
+    name: crystallcap2008EU10-service-metadata
+    parameters:
+      service: metadata
+      service-plan: standard
+      service-name: crystallcap2008EU10-metadata
+      config:
+        default-domain: ${default-domain}
+  - type: org.cloudfoundry.managed-service
+    name: crystallcap2008EU10-service-connectivity
+    parameters:
+      service: connectivity
+      service-plan: lite
+      service-name: crystallcap2008EU10-connectivity
+  - type: org.cloudfoundry.managed-service
+    name: crystallcap2008EU10-service-logs
+    parameters:
+      service: application-logs
+      service-plan: lite
+      service-name: crystallcap2008EU10-logs
+  - type: org.cloudfoundry.managed-service
+    name: crystallcap2008EU10-service-html5-apps-repo-host
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-host
+      service-name: crystallcap2008EU10-html5-apps-repo-host

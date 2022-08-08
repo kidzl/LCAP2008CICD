@@ -1,0 +1,9 @@
+{
+    "DestinationName": "../service/crystallcap2008EU10/",
+    "OfflineEnabled": false,
+    "LanguageURLParam": "",
+    "OnlineOptions": {},
+    "PathSuffix": "",
+    "SourceType": "Cloud",
+    "ServiceUrl":""
+}

@@ -1,0 +1,60 @@
+{
+	"Caption": "SrvBooks",
+	"ActionBar": {
+		"Items": []
+	},
+	"Controls": [
+		{
+			"Sections": [
+				{
+					"ObjectHeader": {
+						"DetailImage": "",
+						"HeadlineText": "{title}",
+						"Subhead": "{stock}",
+						"Tags": [],
+						"BodyText": "",
+						"Footnote": "{currency}",
+						"Description": "{price}",
+						"StatusText": "",
+						"StatusImage": "",
+						"SubstatusImage": "",
+						"SubstatusText": ""
+					},
+					"_Type": "Section.Type.ObjectHeader"
+				},
+				{
+					"KeyAndValues": [
+						{
+							"KeyName": "title",
+							"Value": "{title}"
+						},
+						{
+							"KeyName": "stock",
+							"Value": "{stock}"
+						},
+						{
+							"KeyName": "price",
+							"Value": "{price}"
+						},
+						{
+							"KeyName": "currency",
+							"Value": "{currency}"
+						}
+					],
+					"Layout": {
+						"NumberOfColumns": 2
+					},
+					"MaxItemCount": 1,
+					"_Name": "SectionKeyValue0",
+					"_Type": "Section.Type.KeyValue"
+				}
+			],
+			"DataSubscriptions": [],
+			"_Type": "Control.Type.SectionedTable",
+			"_Name": "SectionedTable"
+		}
+	],
+	"_Type": "Page",
+	"_Name": "SrvBooks_Detail",
+	"PrefersLargeCaption": true
+}

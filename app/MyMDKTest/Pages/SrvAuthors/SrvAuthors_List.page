@@ -1,0 +1,58 @@
+{
+	"Caption": "SrvAuthors",
+	"ActionBar": {
+		"Items": []
+	},
+	"Controls": [
+		{
+			"Sections": [
+				{
+					"Header": {
+						"UseTopPadding": false
+					},
+					"ObjectCell": {
+						"AccessoryType": "disclosureIndicator",
+						"Description": "{modifiedAt}",
+						"DetailImage": "",
+						"DetailImageIsCircular": false,
+						"Icons": [],
+						"OnPress": "/MyMDKTest/Actions/SrvAuthors/NavToSrvAuthors_Detail.action",
+						"StatusImage": "",
+						"Title": "{createdAt}",
+						"Footnote": "{modifiedBy}",
+						"PreserveIconStackSpacing": false,
+						"StatusText": "",
+						"Subhead": "{createdBy}",
+						"SubstatusText": ""
+					},
+					"Search": {
+						"Enabled": true,
+						"Placeholder": "Item Search",
+						"BarcodeScanner": true,
+						"Delay": 500,
+						"MinimumCharacterThreshold": 3
+					},
+					"DataPaging": {
+						"ShowLoadingIndicator": true,
+						"LoadingIndicatorText": "Loading more items, please wait..."
+					},
+					"Target": {
+						"EntitySet": "SrvAuthors",
+						"Service": "/MyMDKTest/Services/service1.service",
+						"QueryOptions": ""
+					},
+					"_Type": "Section.Type.ObjectTable"
+				}
+			],
+			"LoadingIndicator": {
+				"Enabled": true,
+				"Text": "Loading, please wait..."
+			},
+			"_Type": "Control.Type.SectionedTable",
+			"_Name": "SectionedTable"
+		}
+	],
+	"_Type": "Page",
+	"_Name": "SrvAuthors_List",
+	"PrefersLargeCaption": true
+}

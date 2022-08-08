@@ -1,0 +1,1 @@
+sap.ui.define(["sap/fe/core/AppComponent"],function(e){"use strict";return e.extend("crystallcap2008EU10.FioriTest.Component",{metadata:{manifest:"json"}})});
